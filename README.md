@@ -8,7 +8,7 @@ Template files ready to import to repository related to chart repository connect
 * Template files should be embedded in a properly configured repository connected to the Rancher ecosystem at the Rancher Management Server level
 * Used (connected to RMS) repository should be properly structured according to the requirements of the charts repository
 
-Great examples (also inspired by :)) in repositories:  
+Great examples (also inspired by :heart_eyes:) in repositories:  
 https://github.com/rancher/cluster-template-examples  
 https://github.com/bashofmann/rancher-cluster-templates
 
