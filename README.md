@@ -1,6 +1,6 @@
 # rancher-cluster-templates
 
-Rancher Cluster Templates for VMware provider to provision RKE2 Kubernetes clusters.  
+Rancher Cluster Templates to provision RKE2 Kubernetes clusters on VMware cloud provider.  
 Template files ready to import to repository related to chart repository connected to Rancher environment.
 
 ## How to Use
@@ -11,3 +11,7 @@ Template files ready to import to repository related to chart repository connect
 Great examples (also inspired by :)) in repositories:  
 https://github.com/rancher/cluster-template-examples  
 https://github.com/bashofmann/rancher-cluster-templates
+
+## Prerequisities:
+* existing on RMS cloud credential to VMware vSphere environment with appropriate permission
+* existing on VMware and configured as required VM template to provision cluster nodes
