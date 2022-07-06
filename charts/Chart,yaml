@@ -1,0 +1,13 @@
+apiVersion: v1
+name: rke2-vmware
+description: RKE2 on VMware
+version: 0.2.6.5
+appVersion: RMS 2.6.5
+annotations:
+  catalog.cattle.io/type: cluster-template
+  catalog.cattle.io/namespace: fleet-default
+sources:
+  - https://github.com/r2d2pl/rancher-cluster-templates.git
+maintainers:
+  - name: R2D2
+    email: robert@r2d2.pl
