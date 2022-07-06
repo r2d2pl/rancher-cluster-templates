@@ -1,0 +1,78 @@
+apiVersion: provisioning.cattle.io/v1
+kind: Cluster
+metadata:
+  name: {{ .Values.cluster.name }}
+  namespace: fleet-default
+spec:
+  {{- if .Values.cloudCredentialSecretName }}
+  cloudCredentialSecretName: {{ .Values.cloudCredentialSecretName }}
+  {{- end }}
+  defaultPodSecurityPolicyTemplateName: ''
+  {{- if .Values.kubernetesVersion }}
+  kubernetesVersion: {{ .Values.kubernetesVersion }}
+  {{- end }}
+  localClusterAuthEndpoint:
+    caCerts: ''
+    enabled: false
+    fqdn: ''
+  rkeConfig:
+    chartValues:
+      {{- if eq .Values.cniVersion "cilium" }}
+
+      {{- else }}
+      rke2-{{ .Values.cniVersion }}:
+        {}  
+      {{- end }}
+    etcd:
+      disableSnapshots: false
+      snapshotRetention: 5
+      snapshotScheduleCron: 0 */5 * * *  
+    machineGlobalConfig:
+      cni: {{ .Values.cniVersion }}
+      disable-kube-proxy: false
+      etcd-expose-metrics: false
+      profile: null
+    machinePools:
+    - name: {{ .Values.pool.controlplane.name }}
+      etcdRole: {{ .Values.pool.controlplane.etcd }}
+      controlPlaneRole: {{ .Values.pool.controlplane.controlplane }}
+      workerRole: {{ .Values.pool.controlplane.worker }}
+      quantity: {{ .Values.pool.controlplane.quantity }}
+      unhealthyNodeTimeout: 0s
+      machineConfigRef:
+        kind: VmwarevsphereConfig
+        name: {{ .Values.cluster.name }}-controlplane
+      machineOS: linux
+    - name: {{ .Values.pool.worker.name }}
+      etcdRole: false
+      controlPlaneRole: false
+      workerRole: true
+      quantity: {{ .Values.pool.worker.quantity }}
+      unhealthyNodeTimeout: 0s
+      machineConfigRef:
+        kind: VmwarevsphereConfig
+        name: {{ .Values.cluster.name }}-worker
+      machineOS: linux
+
+    machineSelectorConfig:
+    - config:
+        cloud-provider-name: vsphere
+        protect-kernel-defaults: false
+#    registries:
+#      configs:
+#        authConfigSecretName: string
+#          caBundle: string
+#          insecureSkipVerify: boolean
+#          tlsSecretName: string
+#      mirrors:
+#        endpoint:
+#          - string
+#        rewrite:
+#          key: string
+    upgradeStrategy:
+      controlPlaneConcurrency: 10%
+      controlPlaneDrainOptions:
+        timeout: 0
+      workerConcurrency: 10%
+      workerDrainOptions:
+        timeout: 0
