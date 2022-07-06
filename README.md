@@ -11,14 +11,14 @@ Template files ready to import to repository related to chart repository connect
 ## How to Use
 :arrow_forward: In order to customize the templates, it is necessary to modify some parameters in the following lines (places) according to the properties of the target environment ('NAME'):  
 
-:twisted_rightwards_arrows: In file: **values.yaml** (cloud credential is hardcoded so it is necessary to rename a secret name to appropriate to appropriate for the target RMS environment)
+:twisted_rightwards_arrows: In file: **values.yaml** (cloud credential is hardcoded so it is necessary to rename a secret name to appropriate for the target RMS environment)
 ```
 cloudCredentialSecretName: "cattle-global-data:xx-abcde"
 ```
 :twisted_rightwards_arrows: In files: **nodeconfig-controlplane.yaml**, **nodeconfig-worker.yaml**
 ```
 cloneFrom: /DCNAME/vm/ClusterNAME/Templates/ubuntu-focal-cloudimg-templateNAME
-cloudConfig: ... search: [your.domainNAME,your.nextdomainNAME]\n
+cloudConfig: ... search: [your.domainNAME,your.nextdomainNAME]\n ...
 datacenter: /DCNAME
 datastore: /DCNAME/datastore/datastoreNAME
 folder: /DCNAME/vm/ClusterNAME/VMFolderNAME
