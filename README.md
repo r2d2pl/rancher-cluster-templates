@@ -4,9 +4,9 @@ Rancher Cluster Templates to provision RKE2 Kubernetes clusters on VMware cloud 
 Template files ready to import to repository related to chart repository connected to Rancher Management Server (RMS) environment.
 
 ## Prerequisities:
-* existing on RMS cloud credential to VMware vSphere environment with appropriate permission
-* existing on VMware and configured as required VM template to provision cluster nodes
-* in this example we assume provisioning of nodes based on transport with the use of VMTools mechanisms (vappTransport: com.vmware.guestInfo) and VMware vApp properties (properties used in the script configuration at the cloud-init layer level) 
+:point_right: existing on RMS cloud credential to VMware vSphere environment with appropriate permission  
+:point_right: existing on VMware and configured as required VM template to provision cluster nodes  
+:point_right: in this example we assume provisioning of nodes based on transport with the use of VMTools mechanisms (vappTransport: com.vmware.guestInfo) and VMware vApp properties (properties used in the script configuration at the cloud-init layer level)  
 
 ## How to Use
 :arrow_forward: In order to customize the templates, it is necessary to modify some parameters in the following lines (places) according to the properties of the target environment ('NAME'):  
