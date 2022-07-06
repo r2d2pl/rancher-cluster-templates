@@ -1,0 +1,152 @@
+rancher_min_version: 2.6.5
+questions:
+- variable: cluster.name
+  description: "Specify the name of the cluster"
+  label: "Cluster Name"
+  required: true
+  type: string
+  group: "General"
+#- variable: cloudCredentialSecretName
+#  description: "Choose CloudCredential for cluster provisiong"
+#  label: "CloudCredential Name"
+#  required: true
+#  type: cloudcredential
+#  group: "General"
+- variable: kubernetesVersion
+  default: v1.22.9+rke2r2
+  description: "Specify Kubernetes version"
+  label: "Kubernetes Version"
+  type: enum
+  required: true
+  options:
+  - v1.21.8+rke2r2
+  - v1.21.9+rke2r1  
+  - v1.22.9+rke2r2
+  - v1.23.4+rke2r2
+  - v1.23.6+rke2r2
+  group: "General"
+- variable: cniVersion
+  default: calico
+  description: "Specify Kubernetes CNI"
+  label: "Kubernetes CNI"
+  type: enum
+  required: true
+  options:
+  - calico
+  - cilium
+  - canal
+  group: "General"
+
+- variable: pool.controlplane.name
+  default: controlplane
+  description: "Specify control-plane nodepool name"
+  type: string
+  label: "Nodepool name"
+  required: true
+  group: "Nodepool: control-plane"
+- variable: pool.controlplane.quantity
+  default: 1
+  description: "Specify control-plane node count"
+  type: enum
+  required: true
+  options:
+  - 1
+  - 3
+  label: "Node count"
+  group: "Nodepool: control-plane"
+- variable: pool.controlplane.etcd
+  default: true
+  label: etcd
+  type: boolean
+  group: "Nodepool: control-plane"
+- variable: pool.controlplane.controlplane
+  label: controlplane
+  default: true
+  type: boolean
+  group: "Nodepool: control-plane"
+- variable: pool.controlplane.worker
+  default: false
+  label: worker
+  type: boolean
+  group: "Nodepool: control-plane"
+- variable: pool.controlplane.vmcpu
+  label: "Node CPU Size"
+  default: "4"
+  type: enum
+  required: true
+  options:
+  - 2
+  - 4
+  - 6
+  description: "vSphere CPU count for VM"
+  group: "Nodepool: control-plane"
+- variable: pool.controlplane.vmram
+  label: "Node Memory Size"
+  default: "8192"
+  type: int
+  min: 4
+  max: 5
+  description: "vSphere size of memory for VM (in MB)"
+  group: "Nodepool: control-plane"
+- variable: pool.controlplane.vmdisk
+  label: "Node Disk Size"
+  default: "153600"
+  type: int
+  min: 4
+  max: 6
+  description: "vSphere size of disk for VM (in MB)"
+  group: "Nodepool: control-plane"
+
+- variable: pool.worker.name
+  default: worker
+  description: "Specify worker nodepool name"
+  type: string
+  label: "Nodepool name"
+  required: true
+  group: "Nodepool: worker"
+- variable: pool.worker.quantity
+  default: 1
+  description: "Specify worker node count"
+  type: enum
+  required: true
+  options:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  label: "Node count"
+  group: "Nodepool: worker"
+- variable: pool.worker.vmcpu
+  label: "Node CPU Size"
+  default: "4"
+  type: enum
+  options:
+  - 2
+  - 4
+  - 6
+  - 8
+  - 10
+  description: "vSphere CPU count for VM"
+  group: "Nodepool: worker"
+- variable: pool.worker.vmram
+  label: "Node Memory Size"
+  #default: "16384"
+  type: int
+  min: 4
+  max: 5
+  description: "vSphere size of memory for VM (in MB)"
+  group: "Nodepool: worker"
+- variable: pool.worker.vmdisk
+  label: "Node Disk Size"
+  #default: "153600"
+  type: int
+  min: 4
+  max: 6
+  description: "vSphere size of disk for VM (in MB)"
+  group: "Nodepool: worker"
+  

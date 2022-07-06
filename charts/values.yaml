@@ -1,0 +1,26 @@
+cluster:
+  name: ""
+
+#cloudCredentialSecretName: ""
+cloudCredentialSecretName: "cattle-global-data:xx-abcde"
+
+kubernetesVersion: "v1.22.9+rke2r2"
+
+cniVersion: "calico"
+
+pool:
+  controlplane:
+    name: "controlplane"
+    quantity: 1
+    etcd: true
+    controlplane: true
+    worker: false
+    vmcpu: 4
+    vmram: 8192
+    vmdisk: 153600
+  worker:
+    name: "worker"
+    quantity: 1
+    vmcpu: 4
+    vmram: 16384
+    vmdisk: 153600
