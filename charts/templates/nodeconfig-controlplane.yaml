@@ -1,0 +1,54 @@
+apiVersion: rke-machine-config.cattle.io/v1
+kind: VmwarevsphereConfig
+metadata:
+  name: {{ .Values.cluster.name }}-controlplane
+  namespace: fleet-default
+boot2dockerUrl: ""
+cfgparam:
+- disk.enableUUID=TRUE
+cloneFrom: /DCNAME/vm/ClusterNAME/Templates/ubuntu-focal-cloudimg-templateNAME
+cloudConfig: "#cloud-config\nwrite_files:\n- path: /root/apply.sh\n  permissions:
+    \"0644\"\n  owner: root\n  content: |\n      #!/bin/bash\n      vmtoolsd --cmd
+    'info-get guestinfo.ovfEnv' > /tmp/ovfenv\n      IFName=`ls -C /sys/class/net/
+    | awk '{print $1}'`\n      IPAddress=$(sed -n 's/.*Property oe:key=\"guestinfo.interface.0.ip.0.address\"
+    oe:value=\"\\([^\"]*\\).*/\\1/p' /tmp/ovfenv)\n      SubnetMask=$(sed -n 's/.*Property
+    oe:key=\"guestinfo.interface.0.ip.0.netmask\" oe:value=\"\\([^\"]*\\).*/\\1/p'
+    /tmp/ovfenv)\n      Gateway=$(sed -n 's/.*Property oe:key=\"guestinfo.interface.0.route.0.gateway\"
+    oe:value=\"\\([^\"]*\\).*/\\1/p' /tmp/ovfenv)\n      DNS=$(sed -n 's/.*Property
+    oe:key=\"guestinfo.dns.servers\" oe:value=\"\\([^\"]*\\).*/\\1/p' /tmp/ovfenv)
+    \        \n\n      cat > /etc/netplan/50-cloud-init.yaml << EOF\n      network:\n
+    \       ethernets:\n          $IFName:\n            dhcp4: no\n            addresses:
+    [$IPAddress/24]\n            gateway4: $Gateway\n            nameservers:\n              addresses:
+    [$DNS]\n              search: [your.domainNAME,your.nextdomainNAME]\n        version: 2\n      EOF\n
+    \     sudo netplan apply\n\nruncmd:\n  - bash /root/apply.sh"
+cloudinit: ""
+common:
+  labels: null
+  taints: []
+contentLibrary: ""
+cpuCount: {{ .Values.pool.controlplane.vmcpu | quote }}
+creationType: template
+customAttribute: ""
+datacenter: /DCNAME
+datastore: /DCNAME/datastore/datastoreNAME
+datastoreCluster: ""
+diskSize: {{ .Values.pool.controlplane.vmdisk | quote }}
+folder: /DCNAME/vm/ClusterNAME/VMFolderNAME
+hostsystem: /DCNAME/host/ClusterNAME/esxi.host.fqdnNAME
+memorySize: {{ .Values.pool.controlplane.vmram | quote }}
+network:
+- /DCNAME/network/VMNetworkNAME
+os: linux
+password: ""
+pool: /DCNAME/host/ClusterNAME/Resources
+tag: []
+vappIpallocationpolicy: fixedAllocated
+vappIpprotocol: IPv4
+vappProperty:
+- guestinfo.interface.0.ip.0.address=ip:VMNetworkNAME
+- guestinfo.interface.0.ip.0.netmask=${netmask:VMNetworkNAME}
+- guestinfo.interface.0.route.0.gateway=${gateway:VMNetworkNAME}
+- guestinfo.dns.servers=${dns:VMNetworkNAME}
+vappTransport: com.vmware.guestInfo
+vcenter: ""
+vcenterPort: "443"
