@@ -4,16 +4,16 @@ metadata:
   name: {{ .Values.cluster.name }}
   namespace: fleet-default
 spec:
-  {{- if .Values.cloudCredentialSecretName }}
-  cloudCredentialSecretName: {{ .Values.cloudCredentialSecretName }}
-  {{- end }}
+#  {{- if .Values.cloudCredentialSecretName }}
+#  cloudCredentialSecretName: {{ .Values.cloudCredentialSecretName }}
+#  {{- end }}
   defaultPodSecurityPolicyTemplateName: ''
   {{- if .Values.kubernetesVersion }}
   kubernetesVersion: {{ .Values.kubernetesVersion }}
   {{- end }}
   localClusterAuthEndpoint:
     caCerts: ''
-    enabled: false
+    enabled: true
     fqdn: ''
   rkeConfig:
     chartValues:
@@ -33,26 +33,130 @@ spec:
       etcd-expose-metrics: false
       profile: null
     machinePools:
-    - name: {{ .Values.pool.controlplane.name }}
-      etcdRole: {{ .Values.pool.controlplane.etcd }}
-      controlPlaneRole: {{ .Values.pool.controlplane.controlplane }}
-      workerRole: {{ .Values.pool.controlplane.worker }}
-      quantity: {{ .Values.pool.controlplane.quantity }}
+    {{- if .Values.pool.controlplanedc1.quantity }}
+    - name: {{ .Values.pool.controlplanedc1.name }}
+      etcdRole: {{ .Values.pool.controlplanedc1.etcd }}
+      controlPlaneRole: {{ .Values.pool.controlplanedc1.controlplane }}
+      workerRole: {{ .Values.pool.controlplanedc1.worker }}
+      quantity: {{ .Values.pool.controlplanedc1.quantity }}
       unhealthyNodeTimeout: 0s
       machineConfigRef:
         kind: VmwarevsphereConfig
-        name: {{ .Values.cluster.name }}-controlplane
+        name: {{ .Values.cluster.name }}-{{ .Values.pool.controlplanedc1.name }}
+      cloudCredentialSecretName: "cattle-global-data:cc-dc-dc1"
       machineOS: linux
-    - name: {{ .Values.pool.worker.name }}
-      etcdRole: false
-      controlPlaneRole: false
-      workerRole: true
-      quantity: {{ .Values.pool.worker.quantity }}
+      labels: 
+        topology.kubernetes.io/region: "region"
+        topology.kubernetes.io/zone: "dc1"
+    {{- end }}
+    {{- if .Values.pool.controlplanedc2.quantity }}
+    - name: {{ .Values.pool.controlplanedc2.name }}
+      etcdRole: {{ .Values.pool.controlplanedc2.etcd }}
+      controlPlaneRole: {{ .Values.pool.controlplanedc2.controlplane }}
+      workerRole: {{ .Values.pool.controlplanedc2.worker }}
+      quantity: {{ .Values.pool.controlplanedc2.quantity }}
       unhealthyNodeTimeout: 0s
       machineConfigRef:
         kind: VmwarevsphereConfig
-        name: {{ .Values.cluster.name }}-worker
+        name: {{ .Values.cluster.name }}-{{ .Values.pool.controlplanedc2.name }}
+      cloudCredentialSecretName: "cattle-global-data:cc-dc-dc1"
       machineOS: linux
+      labels: 
+        topology.kubernetes.io/region: "region"
+        topology.kubernetes.io/zone: "dc2"
+    {{- end }}
+    {{- if .Values.pool.controlplanedc3witness.quantity }}
+    - name: {{ .Values.pool.controlplanedc3witness.name }}
+      etcdRole: {{ .Values.pool.controlplanedc3witness.etcd }}
+      controlPlaneRole: {{ .Values.pool.controlplanedc3witness.controlplane }}
+      workerRole: {{ .Values.pool.controlplanedc3witness.worker }}
+      quantity: {{ .Values.pool.controlplanedc3witness.quantity }}
+      unhealthyNodeTimeout: 0s
+      machineConfigRef:
+        kind: VmwarevsphereConfig
+        name: {{ .Values.cluster.name }}-{{ .Values.pool.controlplanedc3witness.name }}
+      cloudCredentialSecretName: "cattle-global-data:cc-dc-dc3witness"
+      machineOS: linux
+      labels: 
+        topology.kubernetes.io/region: "region"
+        topology.kubernetes.io/zone: "dc3witness"
+    {{- end }}
+    {{- if .Values.pool.workerdc1.quantity }}
+    - name: {{ .Values.pool.workerdc1.name }}
+      etcdRole: {{ .Values.pool.workerdc1.etcd }}
+      controlPlaneRole: {{ .Values.pool.workerdc1.controlplane }}
+      workerRole: {{ .Values.pool.workerdc1.worker }}
+      quantity: {{ .Values.pool.workerdc1.quantity }}
+      unhealthyNodeTimeout: 0s
+      machineConfigRef:
+        kind: VmwarevsphereConfig
+        name: {{ .Values.cluster.name }}-{{ .Values.pool.workerdc1.name }}
+      cloudCredentialSecretName: "cattle-global-data:cc-dc-dc1"
+      machineOS: linux
+      labels: 
+        topology.kubernetes.io/region: "region"
+        topology.kubernetes.io/zone: "dc1"
+    {{- end }}
+    {{- if .Values.pool.workerdc2.quantity }}
+    - name: {{ .Values.pool.workerdc2.name }}
+      etcdRole: {{ .Values.pool.workerdc2.etcd }}
+      controlPlaneRole: {{ .Values.pool.workerdc2.controlplane }}
+      workerRole: {{ .Values.pool.workerdc2.worker }}
+      quantity: {{ .Values.pool.workerdc2.quantity }}
+      unhealthyNodeTimeout: 0s
+      machineConfigRef:
+        kind: VmwarevsphereConfig
+        name: {{ .Values.cluster.name }}-{{ .Values.pool.workerdc2.name }}
+      cloudCredentialSecretName: "cattle-global-data:cc-dc-dc1"
+      machineOS: linux
+      labels: 
+        topology.kubernetes.io/region: "region"
+        topology.kubernetes.io/zone: "dc2"
+    {{- end }}
+    {{- if .Values.pool.storagedc1.quantity }}
+    - name: {{ .Values.pool.storagedc1.name }}
+      etcdRole: {{ .Values.pool.storagedc1.etcd }}
+      controlPlaneRole: {{ .Values.pool.storagedc1.controlplane }}
+      workerRole: {{ .Values.pool.storagedc1.worker }}
+      quantity: {{ .Values.pool.storagedc1.quantity }}
+      unhealthyNodeTimeout: 0s
+      machineConfigRef:
+        kind: VmwarevsphereConfig
+        name: {{ .Values.cluster.name }}-{{ .Values.pool.storagedc1.name }}
+      cloudCredentialSecretName: "cattle-global-data:cc-dc-dc1"  
+      machineOS: linux
+      labels:
+        topology.kubernetes.io/region: "region"
+        topology.kubernetes.io/zone: "dc1-longhorn"
+        longhorn.io/node: 'true'
+        node.longhorn.io/create-default-disk: 'true'
+      taints: 
+        - key: longhorn.io/node
+          value: 'true'
+          effect: NoSchedule
+    {{- end }}
+    {{- if .Values.pool.storagedc2.quantity }}
+    - name: {{ .Values.pool.storagedc2.name }}
+      etcdRole: {{ .Values.pool.storagedc2.etcd }}
+      controlPlaneRole: {{ .Values.pool.storagedc2.controlplane }}
+      workerRole: {{ .Values.pool.storagedc2.worker }}
+      quantity: {{ .Values.pool.storagedc2.quantity }}
+      unhealthyNodeTimeout: 0s
+      machineConfigRef:
+        kind: VmwarevsphereConfig
+        name: {{ .Values.cluster.name }}-{{ .Values.pool.storagedc2.name }}
+      cloudCredentialSecretName: "cattle-global-data:cc-dc-dc1"
+      machineOS: linux
+      labels:
+        topology.kubernetes.io/region: "region"
+        topology.kubernetes.io/zone: "dc2-longhorn"
+        longhorn.io/node: 'true'
+        node.longhorn.io/create-default-disk: 'true'
+      taints: 
+        - key: longhorn.io/node
+          value: 'true'
+          effect: NoSchedule   
+    {{- end }}
 
     machineSelectorConfig:
     - config:
@@ -68,7 +172,7 @@ spec:
 #        endpoint:
 #          - string
 #        rewrite:
-#          key: string
+#          key: string    
     upgradeStrategy:
       controlPlaneConcurrency: 10%
       controlPlaneDrainOptions:
