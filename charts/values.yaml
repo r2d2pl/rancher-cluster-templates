@@ -2,25 +2,146 @@ cluster:
   name: ""
 
 #cloudCredentialSecretName: ""
-cloudCredentialSecretName: "cattle-global-data:xx-abcde"
+#cloudCredentialSecretName: "cattle-global-data:xx-ancde"
 
-kubernetesVersion: "v1.22.9+rke2r2"
+kubernetesVersion: "v1.25.7-rke2r1"
 
 cniVersion: "calico"
 
+DC1DatastoreCluster: "DC1dsclusterNAME"
+DC2DatastoreCluster: "DC2dsclusterNAME"
+tagregion: "urn:vmomi:InventoryServiceTag:ID8-ID4-ID4-ID4-ID12:GLOBAL"
+tagzone1: "urn:vmomi:InventoryServiceTag:ID8-ID4-ID4-ID4-ID12:GLOBAL"
+tagzone2: "urn:vmomi:InventoryServiceTag:ID8-ID4-ID4-ID4-ID12:GLOBAL"
+tagzone3: "urn:vmomi:InventoryServiceTag:ID8-ID4-ID4-ID4-ID12:GLOBAL"
+
 pool:
-  controlplane:
-    name: "controlplane"
+  controlplanedc1:
+    name: "controlplane-dc1"
     quantity: 1
     etcd: true
     controlplane: true
     worker: false
-    vmcpu: 4
+    vmbasket: "SMALL -> vCPU:2 / MEM:8GB"
+    vmcpu: 2
+    vmtinycpu: 2
+    vmsmallcpu: 2
+    vmstandardcpu: 4
     vmram: 8192
+    vmtinyram: 8192
+    vmsmallram: 8192
+    vmstandardram: 16384
     vmdisk: 153600
-  worker:
-    name: "worker"
+    host: "esxi.host.fqdnNAME"
+    vlan: "VMNetworkNAME -> NETWORK_DESCRIPTION"
+  controlplanedc2:
+    name: "controlplane-dc2"
     quantity: 1
-    vmcpu: 4
-    vmram: 16384
+    etcd: true
+    controlplane: true
+    worker: false
+    vmbasket: "SMALL -> vCPU:2 / MEM:8GB"
+    vmcpu: 2
+    vmtinycpu: 2
+    vmsmallcpu: 2
+    vmstandardcpu: 4
+    vmram: 8192
+    vmtinyram: 8192
+    vmsmallram: 8192
+    vmstandardram: 16384
     vmdisk: 153600
+    host: "esxi.host.fqdnNAME"
+    vlan: "VMNetworkNAME -> NETWORK_DESCRIPTION"
+  controlplanedc3witness:
+    name: "controlplane-dc3witness"
+    quantity: 1
+    etcd: true
+    controlplane: true
+    worker: false
+    vmbasket: "SMALL -> vCPU:2 / MEM:8GB"
+    vmcpu: 2
+    vmtinycpu: 2
+    vmsmallcpu: 2
+    vmstandardcpu: 4
+    vmram: 8192
+    vmtinyram: 8192
+    vmsmallram: 8192
+    vmstandardram: 16384
+    vmdisk: 153600
+    host: "esxi.host.fqdnNAME"
+    datastore: "DC3datastoreNAME"
+    vlan: "VMNetworkNAME -> NETWORK_DESCRIPTION"
+
+  workerdc1:
+    name: "worker-dc1"
+    quantity: 1
+    etcd: false
+    controlplane: false
+    worker: true
+    vmbasket: "SMALL -> vCPU:4 / MEM:16GB"
+    vmcpu: 4
+    vmtinycpu: 4
+    vmsmallcpu: 4
+    vmstandardcpu: 8
+    vmram: 16384
+    vmtinyram: 16384
+    vmsmallram: 16384
+    vmstandardram: 65536
+    vmdisk: 153600
+    host: "esxi.host.fqdnNAME"
+    vlan: "VMNetworkNAME -> NETWORK_DESCRIPTION"
+  workerdc2:
+    name: "worker-dc2"
+    quantity: 1
+    etcd: false
+    controlplane: false
+    worker: true
+    vmbasket: "SMALL -> vCPU:4 / MEM:16GB"
+    vmcpu: 4
+    vmtinycpu: 4
+    vmsmallcpu: 4
+    vmstandardcpu: 8
+    vmram: 16384
+    vmtinyram: 16384
+    vmsmallram: 16384
+    vmstandardram: 65536
+    vmdisk: 153600
+    host: "esxi.host.fqdnNAME"
+    vlan: "VMNetworkNAME -> NETWORK_DESCRIPTION"  
+
+  storagedc1:
+    name: "storage-dc1"
+    quantity: 1
+    etcd: false
+    controlplane: false
+    worker: true
+    vmbasket: "SMALL -> vCPU:4 / MEM:32GB"
+    vmcpu: 2
+    vmtinycpu: 2
+    vmsmallcpu: 4
+    vmstandardcpu: 8
+    vmram: 16384
+    vmtinyram: 16384
+    vmsmallram: 32768
+    vmstandardram: 65536
+    vmdisk: 153600
+    host: "esxi.host.fqdnNAME"
+    vlan: "VMNetworkNAME -> NETWORK_DESCRIPTION"
+  storagedc2:
+    name: "storage-dc2"
+    quantity: 1
+    etcd: false
+    controlplane: false
+    worker: true
+    vmbasket: "SMALL -> vCPU:4 / MEM:32GB"
+    vmcpu: 2
+    vmtinycpu: 2
+    vmsmallcpu: 4
+    vmstandardcpu: 8
+    vmram: 16384
+    vmtinyram: 16384
+    vmsmallram: 32768
+    vmstandardram: 65536
+    vmdisk: 153600
+    host: "esxi.host.fqdnNAME"
+    vlan: "VMNetworkNAME -> NETWORK_DESCRIPTION"
