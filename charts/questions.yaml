@@ -1,7 +1,7 @@
-rancher_min_version: 2.6.5
+rancher_min_version: 2.7.3
 questions:
 - variable: cluster.name
-  description: "Specify the name of the cluster"
+  description: "Specify name of the cluster"
   label: "Cluster Name"
   required: true
   type: string
@@ -13,102 +13,160 @@ questions:
 #  type: cloudcredential
 #  group: "General"
 - variable: kubernetesVersion
-  default: v1.22.9+rke2r2
   description: "Specify Kubernetes version"
   label: "Kubernetes Version"
-  type: enum
   required: true
+  default: v1.25.7-rke2r1
+  type: enum
   options:
-  - v1.21.8+rke2r2
-  - v1.21.9+rke2r1  
-  - v1.22.9+rke2r2
-  - v1.23.4+rke2r2
-  - v1.23.6+rke2r2
+  - v1.25.7-rke2r1
+  - v1.24.9-rke2r2
+  - v1.24.8-rke2r1
+  #- v1.23.15-rke2r1
+  #- v1.23.7-rke2r2
+  #- v1.22.13-rke2r1
+  #- v1.22.10-rke2r2
+  #- v1.21.10+rke2r2
+  #- v1.21.9+rke2r1
   group: "General"
 - variable: cniVersion
-  default: calico
   description: "Specify Kubernetes CNI"
   label: "Kubernetes CNI"
-  type: enum
   required: true
+  default: calico
+  type: enum
   options:
   - calico
   - cilium
   - canal
   group: "General"
 
-- variable: pool.controlplane.name
-  default: controlplane
-  description: "Specify control-plane nodepool name"
-  type: string
-  label: "Nodepool name"
-  required: true
-  group: "Nodepool: control-plane"
-- variable: pool.controlplane.quantity
-  default: 1
-  description: "Specify control-plane node count"
-  type: enum
-  required: true
-  options:
-  - 1
-  - 3
+- variable: pool.controlplanedc1.quantity
+  description: "Specify controlplane node count"
   label: "Node count"
-  group: "Nodepool: control-plane"
-- variable: pool.controlplane.etcd
-  default: true
-  label: etcd
-  type: boolean
-  group: "Nodepool: control-plane"
-- variable: pool.controlplane.controlplane
-  label: controlplane
-  default: true
-  type: boolean
-  group: "Nodepool: control-plane"
-- variable: pool.controlplane.worker
-  default: false
-  label: worker
-  type: boolean
-  group: "Nodepool: control-plane"
-- variable: pool.controlplane.vmcpu
-  label: "Node CPU Size"
-  default: "4"
-  type: enum
   required: true
-  options:
-  - 2
-  - 4
-  - 6
-  description: "vSphere CPU count for VM"
-  group: "Nodepool: control-plane"
-- variable: pool.controlplane.vmram
-  label: "Node Memory Size"
-  default: "8192"
-  type: int
-  min: 4
-  max: 5
-  description: "vSphere size of memory for VM (in MB)"
-  group: "Nodepool: control-plane"
-- variable: pool.controlplane.vmdisk
-  label: "Node Disk Size"
-  default: "153600"
-  type: int
-  min: 4
-  max: 6
-  description: "vSphere size of disk for VM (in MB)"
-  group: "Nodepool: control-plane"
-
-- variable: pool.worker.name
-  default: worker
-  description: "Specify worker nodepool name"
-  type: string
-  label: "Nodepool name"
-  required: true
-  group: "Nodepool: worker"
-- variable: pool.worker.quantity
   default: 1
-  description: "Specify worker node count"
   type: enum
+  options:
+  - 0
+  - 1
+  - 2
+  - 3
+  group: "Nodepool: controlplane-dc1"
+- variable: pool.controlplanedc1.worker
+  description: "Assign worker role to controlplane node ?"
+  label: "Assign worker role"
   required: true
+  default: false
+  type: enum
+  options:
+  - false
+  - true
+  group: "Nodepool: controlplane-dc1"
+- variable: pool.controlplanedc1.vmbasket
+  description: "Size of VMs in pool"
+  label: "Desired size of VM"
+  required: true
+  default: "SMALL -> vCPU:2 / MEM:8GB"
+  type: enum
+  options:
+  - TINY -> vCPU:2 / MEM:8GB
+  - SMALL -> vCPU:2 / MEM:8GB
+  - STANDARD -> vCPU:4 / MEM:16GB
+  group: "Nodepool: controlplane-dc1"
+- variable: pool.controlplanedc1.vlan
+  description: "vSphere VLAN name for nodepool VMs"
+  label: "Nodepool VLAN name"
+  required: true
+  default: "VMNetworkNAME -> NETWORK_DESCRIPTION"
+  type: enum
+  options:
+  - VMNetworkNAME -> NETWORK_DESCRIPTION
+  - VMNetworkNAME_OTHER -> NETWORK_DESCRIPTION
+  group: "Nodepool: controlplane-dc1"
+
+- variable: pool.controlplanedc2.quantity
+  description: "Specify controlplane node count"
+  label: "Node count"
+  required: true
+  default: 1
+  type: enum
+  options:
+  - 0
+  - 1
+  - 2
+  - 3
+  group: "Nodepool: controlplane-dc2"
+- variable: pool.controlplanedc2.worker
+  description: "Assign worker role to controlplane node ?"
+  label: "Assign worker role"
+  required: true
+  default: false
+  type: enum
+  options:
+  - false
+  - true
+  group: "Nodepool: controlplane-dc2"
+- variable: pool.controlplanedc2.vmbasket
+  description: "Size of VMs in pool"
+  label: "Desired size of VM"
+  required: true
+  default: "SMALL -> vCPU:2 / MEM:8GB"
+  type: enum
+  options:
+  - TINY -> vCPU:2 / MEM:8GB
+  - SMALL -> vCPU:2 / MEM:8GB
+  - STANDARD -> vCPU:4 / MEM:16GB
+  group: "Nodepool: controlplane-dc2"
+- variable: pool.controlplanedc2.vlan
+  description: "vSphere VLAN name for nodepool VMs"
+  label: "Nodepool VLAN name"
+  required: true
+  default: "VMNetworkNAME -> NETWORK_DESCRIPTION"
+  type: enum
+  options:
+  - VMNetworkNAME -> NETWORK_DESCRIPTION
+  - VMNetworkNAME_OTHER -> NETWORK_DESCRIPTION
+  group: "Nodepool: controlplane-dc2"
+
+- variable: pool.controlplanedc3witness.quantity
+  description: "Specify controlplane node count"
+  label: "Node count"
+  required: true
+  default: 1
+  type: enum
+  options:
+  - 0
+  - 1
+  group: "Nodepool: controlplane-dc3witness"
+- variable: pool.controlplanedc3witness.vmbasket
+  description: "Size of VMs in pool"
+  label: "Desired size of VM"
+  required: true
+  default: "SMALL -> vCPU:2 / MEM:8GB"
+  type: enum
+  options:
+  - TINY -> vCPU:2 / MEM:8GB
+  - SMALL -> vCPU:2 / MEM:8GB
+  - STANDARD -> vCPU:4 / MEM:16GB
+  group: "Nodepool: controlplane-dc3witness"
+- variable: pool.controlplanedc3witness.vlan
+  description: "vSphere VLAN name for nodepool VMs"
+  label: "Nodepool VLAN name"
+  required: true
+  default: "VMNetworkNAME -> NETWORK_DESCRIPTION"
+  type: enum
+  options:
+  - VMNetworkNAME -> NETWORK_DESCRIPTION
+  - VMNetworkNAME_OTHER -> NETWORK_DESCRIPTION
+  group: "Nodepool: controlplane-dc3witness"
+
+- variable: pool.workerdc1.quantity
+  description: "Specify worker node count"
+  label: "Node count"
+  required: true
+  default: 1
+  type: enum
   options:
   - 0
   - 1
@@ -119,34 +177,138 @@ questions:
   - 6
   - 7
   - 8
-  label: "Node count"
-  group: "Nodepool: worker"
-- variable: pool.worker.vmcpu
-  label: "Node CPU Size"
-  default: "4"
+  group: "Nodepool: worker-dc1"
+- variable: pool.workerdc1.vmbasket
+  description: "Size of VMs in pool"
+  label: "Desired size of VM"
+  required: true
+  default: "SMALL -> vCPU:4 / MEM:16GB"
   type: enum
   options:
+  - TINY -> vCPU:4 / MEM:16GB
+  - SMALL -> vCPU:4 / MEM:16GB
+  - STANDARD -> vCPU:8 / MEM:64GB
+  group: "Nodepool: worker-dc1"
+- variable: pool.workerdc1.vlan
+  description: "vSphere VLAN name for nodepool VMs"
+  label: "Nodepool VLAN name"
+  required: true
+  default: "VMNetworkNAME -> NETWORK_DESCRIPTION"
+  type: enum
+  options:
+  - VMNetworkNAME -> NETWORK_DESCRIPTION
+  - VMNetworkNAME_OTHER -> NETWORK_DESCRIPTION
+  group: "Nodepool: worker-dc1"
+
+- variable: pool.workerdc2.quantity
+  description: "Specify worker node count"
+  label: "Node count"
+  required: true
+  default: 1
+  type: enum
+  options:
+  - 0
+  - 1
   - 2
+  - 3
   - 4
+  - 5
   - 6
+  - 7
   - 8
-  - 10
-  description: "vSphere CPU count for VM"
-  group: "Nodepool: worker"
-- variable: pool.worker.vmram
-  label: "Node Memory Size"
-  #default: "16384"
-  type: int
-  min: 4
-  max: 5
-  description: "vSphere size of memory for VM (in MB)"
-  group: "Nodepool: worker"
-- variable: pool.worker.vmdisk
-  label: "Node Disk Size"
-  #default: "153600"
-  type: int
-  min: 4
-  max: 6
-  description: "vSphere size of disk for VM (in MB)"
-  group: "Nodepool: worker"
-  
+  group: "Nodepool: worker-dc2"
+- variable: pool.workerdc2.vmbasket
+  description: "Size of VMs in pool"
+  label: "Desired size of VM"
+  required: true
+  default: "SMALL -> vCPU:4 / MEM:16GB"
+  type: enum
+  options:
+  - TINY -> vCPU:4 / MEM:16GB
+  - SMALL -> vCPU:4 / MEM:16GB
+  - STANDARD -> vCPU:8 / MEM:64GB
+  group: "Nodepool: worker-dc2"
+- variable: pool.workerdc2.vlan
+  description: "vSphere VLAN name for nodepool VMs"
+  label: "Nodepool VLAN name"
+  required: true
+  default: "VMNetworkNAME -> NETWORK_DESCRIPTION"
+  type: enum
+  options:
+  - VMNetworkNAME -> NETWORK_DESCRIPTION
+  - VMNetworkNAME_OTHER -> NETWORK_DESCRIPTION
+  group: "Nodepool: worker-dc2"
+
+- variable: pool.storagedc1.quantity
+  description: "Specify storage node count"
+  label: "Node count"
+  required: true
+  default: 1
+  type: enum
+  options:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  group: "Nodepool: storage-dc1"
+- variable: pool.storagedc1.vmbasket
+  description: "Size of VMs in pool"
+  label: "Desired size of VM"
+  required: true
+  default: "SMALL -> vCPU:4 / MEM:32GB"
+  type: enum
+  options:
+  - TINY -> vCPU:2 / MEM:16GB
+  - SMALL -> vCPU:4 / MEM:32GB
+  - STANDARD -> vCPU:8 / MEM:64GB
+  group: "Nodepool: storage-dc1"
+- variable: pool.storagedc1.vlan
+  description: "vSphere VLAN name for nodepool VMs"
+  label: "Nodepool VLAN name"
+  required: true
+  default: "VMNetworkNAME -> NETWORK_DESCRIPTION"
+  type: enum
+  options:
+  - VMNetworkNAME -> NETWORK_DESCRIPTION
+  - VMNetworkNAME_OTHER -> NETWORK_DESCRIPTION
+  group: "Nodepool: storage-dc1"
+
+- variable: pool.storagedc2.quantity
+  description: "Specify storage node count"
+  label: "Node count"
+  required: true
+  default: 1
+  type: enum
+  options:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  group: "Nodepool: storage-dc2"
+- variable: pool.storagedc2.vmbasket
+  description: "Size of VMs in pool"
+  label: "Desired size of VM"
+  required: true
+  default: "SMALL -> vCPU:4 / MEM:32GB"
+  type: enum
+  options:
+  - TINY -> vCPU:2 / MEM:16GB
+  - SMALL -> vCPU:4 / MEM:32GB
+  - STANDARD -> vCPU:8 / MEM:64GB
+  group: "Nodepool: storage-dc2"
+- variable: pool.storagedc2.vlan
+  description: "vSphere VLAN name for nodepool VMs"
+  label: "Nodepool VLAN name"
+  required: true
+  default: "VMNetworkNAME -> NETWORK_DESCRIPTION"
+  type: enum
+  options:
+  - VMNetworkNAME -> NETWORK_DESCRIPTION
+  - VMNetworkNAME_OTHER -> NETWORK_DESCRIPTION
+  group: "Nodepool: storage-dc2"
