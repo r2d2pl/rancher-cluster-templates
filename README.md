@@ -1,26 +1,27 @@
 # rancher-cluster-templates
 
 Rancher Cluster Templates to provision RKE2 Kubernetes clusters on VMware cloud provider.  
-Template files ready to import to repository related to chart repository connected to Rancher Management Server (RMS) environment.
+Template files after adaptation to the target environment are ready to import to repository related to chart repository connected to Rancher Management Server (RMS) environment.
 
 ## Prerequisities:
-:point_right: existing on RMS cloud credential to VMware vSphere environment with appropriate permission  
+:point_right: existing on RMS cloud credential to VMware vSphere environment or environments (vCenter servers occurrences) with appropriate permission  
 :point_right: existing on VMware and configured as required VM template to provision cluster nodes  
-:point_right: in this example we assume provisioning of nodes based on transport with the use of VMTools mechanisms (vappTransport: com.vmware.guestInfo) and VMware vApp properties (properties used in the script configuration at the cloud-init layer level)  
+:point_right: in this example we assume provisioning of nodes based on ubuntu cloud image and configured transport with use of VMTools mechanisms (vappTransport: com.vmware.guestInfo) and VMware vApp properties (properties used in the script configuration at the cloud-init layer level)  
 
 ## How to Use
 :arrow_forward: In order to customize the templates, it is necessary to modify some parameters in the following lines (places) according to the properties of the target environment ('NAME'):  
 
-:twisted_rightwards_arrows: In file: **values.yaml** (cloud credential is hardcoded so it is necessary to rename a secret name to appropriate for the target RMS environment)
+:twisted_rightwards_arrows: In file: **values.yaml** (cloud credential is hardcoded so it is necessary to rename a secret name to appropriate for the target RMS environment) or in case of multi vCenter environment credetials are hardcoded in file **cluster.yaml** in sections of each nodepools:
 ```
-cloudCredentialSecretName: "cattle-global-data:xx-abcde"
+cloudCredentialSecretName: "cattle-global-data:xx-abcde"  -or-  cloudCredentialSecretName: "cattle-global-data:cc-dc-dcX"
 ```
-:twisted_rightwards_arrows: In files: **nodeconfig-controlplane.yaml**, **nodeconfig-worker.yaml**
+
+:twisted_rightwards_arrows: In files: **nodeconfig-controlplane[-zoneX].yaml**, **nodeconfig-worker/storage[-zoneX].yaml**
 ```
-cloneFrom: /DCNAME/vm/ClusterNAME/Templates/ubuntu-focal-cloudimg-templateNAME
+cloneFrom: /DCNAME/vm/ClusterNAME/Templates/ubuntu-jammy-cloudimg-templateNAME
 cloudConfig: ... search: [your.domainNAME,your.nextdomainNAME]\n ...
 datacenter: /DCNAME
-datastore: /DCNAME/datastore/datastoreNAME
+datastore[Cluster]: /DCNAME/datastore/datastorefolderNAME/datastore[Cluster]NAME
 folder: /DCNAME/vm/ClusterNAME/VMFolderNAME
 hostsystem: /DCNAME/host/ClusterNAME/esxi.host.fqdnNAME
 network:
