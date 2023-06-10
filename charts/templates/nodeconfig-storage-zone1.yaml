@@ -1,0 +1,88 @@
+apiVersion: rke-machine-config.cattle.io/v1
+kind: VmwarevsphereConfig
+metadata:
+  name: {{ .Values.cluster.name }}-{{ .Values.pool.storagedc1.name }}
+  namespace: fleet-default
+boot2dockerUrl: ""
+cfgparam:
+- disk.enableUUID=TRUE
+cloneFrom: /DCNAME/vm/ClusterNAME/Templates/ubuntu-jammy-cloudimg-templateNAME
+cloudConfig: |
+  #cloud-config
+  write_files:
+  - path: /root/apply.sh
+    permissions: "0644"
+    owner: root
+    content: |
+        #!/bin/bash
+        vmtoolsd --cmd 'info-get guestinfo.ovfEnv' > /tmp/ovfenv
+        IFName=`ls -C /sys/class/net/ | awk '{print $1}'`
+        IPAddress=$(sed -n 's/.*Property oe:key="guestinfo.interface.0.ip.0.address" oe:value="\([^"]*\).*/\1/p' /tmp/ovfenv)
+        SubnetMask=$(sed -n 's/.*Property oe:key="guestinfo.interface.0.ip.0.netmask" oe:value="\([^"]*\).*/\1/p' /tmp/ovfenv)
+        SubnetMaskSN=$(sed -n 's/.*\[\([^]]*\).*/\1/p' /tmp/ovfenv)
+        Gateway=$(sed -n 's/.*Property oe:key="guestinfo.interface.0.route.0.gateway" oe:value="\([^"]*\).*/\1/p' /tmp/ovfenv)
+        DNS=$(sed -n 's/.*Property oe:key="guestinfo.dns.servers" oe:value="\([^"]*\).*/\1/p' /tmp/ovfenv)
+
+        cat > /etc/netplan/50-cloud-init.yaml << EOF
+        network:
+          ethernets:
+            $IFName:
+              dhcp4: no
+              addresses: [$IPAddress/$SubnetMaskSN]
+              gateway4: $Gateway
+              nameservers:
+                addresses: [$DNS]
+                search: [your.domainNAME,your.nextdomainNAME]
+          version: 2
+        EOF
+        sudo netplan apply
+  runcmd:
+    - bash /root/apply.sh
+cloudinit: ""
+common:
+  labels: null
+  taints: []
+contentLibrary: ""
+#cpuCount: {{ .Values.pool.storagedc1.vmcpu | quote }}
+{{- if eq (regexFind "^\\S*" .Values.pool.storagedc1.vmbasket) "TINY" }}
+cpuCount: {{ .Values.pool.storagedc1.vmtinycpu | quote }}
+{{- else if eq (regexFind "^\\S*" .Values.pool.storagedc1.vmbasket) "SMALL" }}
+cpuCount: {{ .Values.pool.storagedc1.vmsmallcpu | quote }}
+{{- else }}
+cpuCount: {{ .Values.pool.storagedc1.vmstandardcpu | quote }}
+{{- end }}
+creationType: template
+customAttribute: ""
+datacenter: /DCNAME
+datastore: ""
+datastoreCluster: /DCNAME/datastore/datastorefolderNAME/{{ .Values.DC1DatastoreCluster }}
+diskSize: {{ .Values.pool.storagedc1.vmdisk | quote }}
+folder: /DCNAME/vm/ClusterNAME/VMFolderNAME
+hostsystem: /DCNAME/host/ClusterNAME/{{ .Values.pool.storagedc1.host }}
+#memorySize: {{ .Values.pool.storagedc1.vmram | quote }}
+{{- if eq (regexFind "^\\S*" .Values.pool.storagedc1.vmbasket) "TINY" }}
+memorySize: {{ .Values.pool.storagedc1.vmtinyram | quote }}
+{{- else if eq (regexFind "^\\S*" .Values.pool.storagedc1.vmbasket) "SMALL" }}
+memorySize: {{ .Values.pool.storagedc1.vmsmallram | quote }}
+{{- else }}
+memorySize: {{ .Values.pool.storagedc1.vmstandardram | quote }}
+{{- end }}
+network:
+## regex ^\S*
+- /DCNAME/network/{{ regexFind "^\\S*" .Values.pool.storagedc1.vlan }}
+os: linux
+password: ""
+pool: /DCNAME/host/ClusterNAME/Resources
+tag:
+- {{ .Values.tagregion }}
+- {{ .Values.tagzone1 }}
+vappIpallocationpolicy: fixedAllocated
+vappIpprotocol: IPv4
+vappProperty:
+- guestinfo.interface.0.ip.0.address=ip:{{ regexFind "^\\S*" .Values.pool.storagedc1.vlan }}
+- guestinfo.interface.0.ip.0.netmask=${netmask:{{ regexFind "^\\S*" .Values.pool.storagedc1.vlan }}}
+- guestinfo.interface.0.route.0.gateway=${gateway:{{ regexFind "^\\S*" .Values.pool.storagedc1.vlan }}}
+- guestinfo.dns.servers=${dns:{{ regexFind "^\\S*" .Values.pool.storagedc1.vlan }}}
+vappTransport: com.vmware.guestInfo
+vcenter: ""
+vcenterPort: "443"
